@@ -1,0 +1,13 @@
+<mat-card class="banner-card">
+  <mat-card-header>
+    <mat-card-title>{{quote.symbol}}</mat-card-title>
+    <mat-card-subtitle>{{quote.longName}}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="price">{{ formatValue(quote.regularMarketPrice) }}</div>
+    <div class="change" [ngClass]="checkChange(quote.regularMarketChange)?'gain':'loss'">
+      <div class="price-change">{{ formatValue(quote.regularMarketChange) }}</div>
+      <div class="percent">({{ formatValue(quote.regularMarketChangePercent) }}%)</div>
+    </div>
+  </mat-card-content>
+</mat-card>

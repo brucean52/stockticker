@@ -1,0 +1,4 @@
+.banner-container {
+  display: flex;
+  overflow-x: scroll;
+}

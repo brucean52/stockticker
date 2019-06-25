@@ -1,0 +1,39 @@
+.banner-card {
+  width: 125px;
+  padding: 10px;
+  border-radius: 0;
+  cursor: pointer;
+  border-top: 1px solid rgba(0,0,0,0.2);
+}
+
+.banner-card:hover {
+  border: solid 1px grey;
+}
+
+mat-card-subtitle {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 12px;
+}
+
+.price {
+  padding-left: 10px;
+  font-size: 24px;
+}
+
+::ng-deep .mat-card-header-text{
+  width: 100px;
+}
+
+.change {
+  display: flex;
+  justify-content: space-around;
+  font-weight: bold;
+}
+.gain {
+  color: #4caf50;
+}
+.loss {
+  color: #f44336;
+}

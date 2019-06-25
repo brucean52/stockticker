@@ -1,0 +1,53 @@
+h2, h3, h4, h5, h6 {
+  font-family: 'Roboto', sans-serif;
+}
+h6.long-name {
+  margin-top: 3em;
+  margin-left: 5px;
+}
+.quote-container {
+  width: 50%;
+  margin: auto;
+}
+.summary-container {
+  display: flex;
+  justify-content: space-between;
+  width: 50%;
+  margin: auto;
+  min-height: 200px;
+}
+.price-container {
+  display: flex;
+}
+h3 {
+  margin-right: 15px;
+  margin-top: 1.2em;
+}
+h2.price{
+  margin-right: 15px;
+}
+
+.list-container {
+  display: flex;
+}
+
+/* mat-list-item {
+  width: 500px;
+} */
+
+.card-list {
+  width: 60%;
+  margin: 5% 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.left-list {
+  width: 55%;
+}
+.gain {
+  color: #4caf50;
+}
+.loss {
+  color: #f44336;
+}

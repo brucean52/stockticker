@@ -1,0 +1,5 @@
+<div class="banner-container" *ngIf="!loading">
+  <div *ngFor="let quote of quoteArray" (click)="stockClicked(quote.symbol)">
+    <app-banner-quote [quote]="quote"></app-banner-quote>
+  </div>
+</div>
