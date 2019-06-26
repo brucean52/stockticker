@@ -27,13 +27,9 @@ h2.price{
   margin-right: 15px;
 }
 
-.list-container {
+.summary-card {
   display: flex;
 }
-
-/* mat-list-item {
-  width: 500px;
-} */
 
 .card-list {
   width: 60%;

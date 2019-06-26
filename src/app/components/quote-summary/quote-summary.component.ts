@@ -13,11 +13,6 @@ export class QuoteSummaryComponent implements OnInit, OnDestroy, OnChanges {
   @Input() selectedStock: any;
   @ViewChild(TableComponent)
   table: TableComponent;
-  tableHeader: any = {
-    price: '',
-    change: '',
-    changePercent: ''
-  };
   tableData: any = [
     {
       name: 'Previous Close',
@@ -93,15 +88,8 @@ export class QuoteSummaryComponent implements OnInit, OnDestroy, OnChanges {
     })
     .valueChanges.subscribe(({data, loading}) => {
       this.loading = loading;
-      console.log('get detail', data);
-      console.log('selected stock after resp', this.selectedStock);
       this.quoteProfile = data['getDetail']['summaryProfile'];
       this.quoteData = {...data['getDetail']['summaryDetail'], ...data['getDetail']['defaultKeyStatistics']};
-      this.tableHeader = {
-        price: this.formatValue(this.selectedStock['regularMarketPrice']),
-        change: this.formatValue(this.selectedStock['regularMarketChange']),
-        changePercent: this.formatValue(this.selectedStock['regularMarketChangePercent'])
-      };
       this.createTableData(this.quoteData);
     });
   }

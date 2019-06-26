@@ -7,7 +7,6 @@ import { MatTable, MatTableDataSource} from "@angular/material";
   styleUrls: ['./table.component.css']
 })
 export class TableComponent implements OnInit, OnChanges {
-  @Input() tableHeader: any;
   @Input() tableData: any;
   displayedColumns: string[] = ['name', 'value', 'name2', 'value2'];
   dataSource = new MatTableDataSource<any>();
