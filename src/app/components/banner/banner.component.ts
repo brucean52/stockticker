@@ -1,5 +1,4 @@
-import { Component, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, Output, OnInit, OnChanges, SimpleChanges, EventEmitter, Input } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
@@ -8,44 +7,50 @@ import gql from 'graphql-tag';
   templateUrl: './banner.component.html',
   styleUrls: ['./banner.component.css']
 })
-export class BannerComponent implements OnInit, OnDestroy {
+export class BannerComponent implements OnInit, OnChanges {
+  @Input() quoteArray: string[];
+  @Input() loading: boolean;
   @Output() activeQuote = new EventEmitter();
-  querySubscription: Subscription;
-  DEFAULT_STOCK = 'AMZN';
-  quotes = 'AMZN,AAPL,AMD,BA,GOOG,FB,INTC,MSFT,MU,NVDA,TSM,TSLA,WORK';
-  quoteArray: any = [];
-  loading: boolean = true;
+  @Output() bannerReady = new EventEmitter();
 
+  quoteArr: any;
+  
   constructor(
     private apollo: Apollo
   ) { }
 
   ngOnInit() {
-    this.querySubscription = this.apollo.watchQuery({
+    this.getBannerQuotes(this.quoteArray.join(','));
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.quoteArray && !changes.quoteArray.firstChange && changes.quoteArray.currentValue) {
+      this.getBannerQuotes(changes.quoteArray.currentValue.join(','));
+    }
+  }
+
+  getBannerQuotes(symbols: string) {
+    this.apollo.watchQuery({
       query: gql`
       query {
-        getQuotes @rest(type: "GetQuotes", path: "market/get-quotes?region=US&lang=en&symbols=${this.quotes}") {
+        getQuotes (symbols: "${symbols}") @rest(type: "GetQuotes", path: "market/get-quotes?region=US&lang=en&symbols={args.symbols}") {
           quoteResponse
         }
       }
       `,
     })
     .valueChanges.subscribe(({data, loading}) => {
-      this.loading = loading;
-      this.quoteArray = data['getQuotes']['quoteResponse']['result'];
-      const defaultStock = this.quoteArray.filter( stock => {
-        return stock['symbol'] === this.DEFAULT_STOCK;
-      });
-      this.activeQuote.emit(defaultStock[0]);
+      this.quoteArr = data['getQuotes']['quoteResponse']['result'];
+      if (this.loading) {
+        this.bannerReady.emit();
+      }
     });
   }
-  ngOnDestroy() {
-    this.querySubscription.unsubscribe();
-  }
+  
   stockClicked(stockSymbol: string): void {
-    const selectedStock = this.quoteArray.filter( stock => {
+    const selectedStock = this.quoteArr.filter( stock => {
       return stock['symbol'] === stockSymbol;
     });
-    this.activeQuote.emit(selectedStock[0]);
+    this.activeQuote.emit(selectedStock[0]['symbol']);
   }
 }

@@ -1,7 +1,15 @@
 <app-banner
+  [quoteArray]="quoteArray"
+  [loading]="loading"
   (activeQuote)="activeQuote($event)"
+  (bannerReady)="bannerReady()"
 ></app-banner>
+<app-search-box *ngIf="!loading"
+  [isValidStock]="isValidStock"
+  (searchStock)="searchStock($event)"
+></app-search-box>
 <app-quote-summary
   [selectedStock]="selectedStock"
+  (validSymbol)="validSymbol($event)"
+  (notValidSymbol)="notValidSymbol()"
 ></app-quote-summary>
-

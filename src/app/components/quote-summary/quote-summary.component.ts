@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
@@ -10,10 +10,20 @@ import { TableComponent } from '../table/table.component';
   styleUrls: ['./quote-summary.component.css']
 })
 export class QuoteSummaryComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() selectedStock: any;
+  @Input() selectedStock: string;
+  @Output() validSymbol = new EventEmitter();
+  @Output() notValidSymbol = new EventEmitter();
+
   @ViewChild(TableComponent)
   table: TableComponent;
-  tableData: any = [
+  tableData: any = [];
+
+  loading = true;
+  querySubscription: Subscription;
+  quoteProfile: any = {};
+  quoteData: any = {};
+
+  readonly DEFAULT_TABLE_DATA: any = [
     {
       name: 'Previous Close',
       value: '',
@@ -52,50 +62,77 @@ export class QuoteSummaryComponent implements OnInit, OnDestroy, OnChanges {
     },
   ];
 
-  loading = true;
-  querySubscription: Subscription;
-  quoteProfile: any = {};
-  quoteData: any = {};
+  readonly DEFAULT_QUOTE_PROFILE = {
+    sector: '',
+    industry: ''
+  }
+
+  readonly DEFAULT_QUOTE_DATA = {
+    symbol: '',
+    longName: '',
+    fullExchangeName: '',
+    regularMarketPrice: {
+      fmt: ''
+    },
+    regularMarketChange: {
+      fmt: '',
+      raw: null
+    },
+    regularMarketChangePercent: {
+      fmt: ''
+    }
+  }
 
   constructor(
     private apollo: Apollo
   ) { }
 
   ngOnInit() {
-    if (this.selectedStock.hasOwnProperty('symbol')) {
-      this.getStockDetails();
-    }
+    this.getStockDetails();
   }
+
   ngOnChanges(changes: SimpleChanges) {
     if (!changes.selectedStock.firstChange && changes.selectedStock.previousValue !== changes.selectedStock.currentValue) {
+      this.tableData = this.DEFAULT_TABLE_DATA;
+      this.quoteProfile = this.DEFAULT_QUOTE_PROFILE;
+      this.quoteData = this.DEFAULT_QUOTE_DATA;
       this.getStockDetails();
     }
   }
+
   ngOnDestroy() {
     this.querySubscription.unsubscribe();
   }
+
   getStockDetails() {
     this.querySubscription = this.apollo.watchQuery({
       query: gql`
       query {
-        getDetail (stock: ${this.selectedStock['symbol']}) @rest(type: "getDetail", path: "stock/get-detail?region=US&lang=en&symbol={args.stock}") {
+        getDetail (stock: ${this.selectedStock}) @rest(type: "getDetail", path: "stock/get-detail?region=US&lang=en&symbol={args.stock}") {
           defaultKeyStatistics
           summaryDetail
           summaryProfile
+          quoteData
+          symbol
         }
       }
       `,
     })
-    .valueChanges.subscribe(({data, loading}) => {
+    .valueChanges.subscribe(({data, loading, errors}) => {
+      if (errors) {
+        this.loading = true;
+        this.notValidSymbol.emit();
+      }
+
       this.loading = loading;
+      const symbol = data['getDetail']['symbol'];
+      this.validSymbol.emit(symbol);
       this.quoteProfile = data['getDetail']['summaryProfile'];
-      this.quoteData = {...data['getDetail']['summaryDetail'], ...data['getDetail']['defaultKeyStatistics']};
+      this.quoteData = {...data['getDetail']['summaryDetail'], ...data['getDetail']['defaultKeyStatistics'], ...data['getDetail']['quoteData'][symbol]};
       this.createTableData(this.quoteData);
     });
   }
-  formatValue(value: number): number {
-    return parseFloat(value.toFixed(2));
-  }
+
   checkChange(value: number): boolean {
     if (value > 0 ) {
       return true;
@@ -103,6 +140,7 @@ export class QuoteSummaryComponent implements OnInit, OnDestroy, OnChanges {
       return false;
     }
   }
+
   createTableData(quoteData: any) {
     let dividendData = quoteData['dividendRate']['fmt'] + ' / ' + quoteData['dividendYield']['fmt'];
 

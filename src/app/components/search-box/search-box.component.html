@@ -1,0 +1,21 @@
+<mat-card class="search-container">
+  <mat-card-content>
+    <mat-form-field>
+      <input 
+        matInput 
+        placeholder="Enter Stock Symbol" 
+        (keydown)="onKeydown($event)" 
+        [formControl]="searchControl" 
+        [matAutocomplete]="auto" 
+      >
+      <mat-icon class="search-icon" matSuffix>search</mat-icon>
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option (onSelectionChange)="stockSelected(option.symbol)" *ngFor="let option of searchOption$ | async" [value]="option.symbol">
+          <span>{{option.symbol}}</span>
+          <small>{{option.name}}</small>
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="!isValidStock">Please enter a valid stock symbol</mat-error>
+    </mat-form-field>
+  </mat-card-content>
+</mat-card>

@@ -4,18 +4,18 @@
         <div class="summary-card">
             <mat-list class="left-list">
             <mat-list-item>
-                <h2>{{selectedStock.symbol}}</h2>
-                <h6 class="long-name">{{selectedStock.longName}}</h6>
+                <h2>{{quoteData.symbol}}</h2>
+                <h6 class="long-name">{{quoteData.longName}}</h6>
               </mat-list-item>
               <mat-divider></mat-divider>
               <mat-list-item>
-                <h5>{{selectedStock.fullExchangeName}}</h5>
+                <h5>{{quoteData.fullExchangeName}}</h5>
               </mat-list-item>
               <mat-divider></mat-divider>
               <mat-list-item class="list-price">
-                <h2 class="price">{{ formatValue(selectedStock.regularMarketPrice) }}</h2>
-                <h3 [ngClass]="checkChange(selectedStock.regularMarketChange)?'gain':'loss'">{{ formatValue(selectedStock.regularMarketChange) }}</h3>
-                <h3 [ngClass]="checkChange(selectedStock.regularMarketChange)?'gain':'loss'">({{ formatValue(selectedStock.regularMarketChangePercent) }}%)</h3>
+                <h2 class="price">{{ quoteData.regularMarketPrice.fmt }}</h2>
+                <h3 [ngClass]="checkChange(quoteData.regularMarketChange.raw)?'gain':'loss'">{{ quoteData.regularMarketChange.fmt }}</h3>
+                <h3 *ngIf="quoteData.regularMarketChange.fmt" [ngClass]="checkChange(quoteData.regularMarketChange.raw)?'gain':'loss'">({{ quoteData.regularMarketChangePercent.fmt }})</h3>
               </mat-list-item>
             </mat-list>
             <mat-list>
